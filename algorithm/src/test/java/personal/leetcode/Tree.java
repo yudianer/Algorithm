@@ -3,6 +3,7 @@ package personal.leetcode;
 import org.junit.Test;
 import sun.font.TrueTypeFont;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -26,6 +27,9 @@ import java.util.Stack;
  **/
 
 /**
+ * todo
+ *  树的遍历中， 递归算法比迭代算法快很多。
+ *
  * todo
  *  非递归中：
  *      先序、中序、后序的特点是先往左遍历。
@@ -79,20 +83,96 @@ public class Tree {
     TreeNode t7 = new TreeNode(6);
     TreeNode t8 = new TreeNode(6);
 
+    TreeNode pre = null;
+    int value = Integer.MAX_VALUE;
     {
-        t3.left = t5;
-        t3.right = t1;
-        t5.left = t6;
-        t5.right = t2;
-        t1.left = t0;
-        t1.right = t8;
-        t2.left = t7;
-        t2.right = t4;
+        t4.left = t2;
+        t4.right = t6;
+        t2.left = t1;
+        t2.right = t3;
     }
     @Test
     public void testLow(){
-        System.out.println(lowestCommonAncestor4(t3, t8, t1).val);
+        System.out.println(minDiffInBST3(t4));
     }
+    public int minDiffInBST(TreeNode root) {
+        long pre = Integer.MIN_VALUE;
+        long value =Integer.MAX_VALUE;
+        Stack<TreeNode> roots = new Stack<>();
+        while (true){
+            if (root != null){
+                roots.push(root);
+                root = root.left;
+            }else {
+                if (roots.empty())
+                    break;
+                root = roots.pop();
+                long tmpValue = root.val - pre;
+                if (tmpValue < value ){
+                    value = tmpValue;
+                }
+                pre = root.val;
+                root = root.right;
+            }
+        }
+        return (int) value;
+    }
+
+    public int minDiffInBST2(TreeNode root) {
+        int pre = Integer.MIN_VALUE;
+        int value =Integer.MAX_VALUE;
+        Stack<TreeNode> roots = new Stack<>();
+        while (true){
+            if (root != null){
+                roots.push(root);
+                root = root.left;
+            }else {
+                if (roots.empty())
+                    break;
+                root = roots.pop();
+                pre = root.val;
+                root = root.right;
+                break;
+            }
+        }
+        while (true){
+            if (root != null){
+                roots.push(root);
+                root = root.left;
+            }else {
+                if (roots.empty())
+                    break;
+                root = roots.pop();
+                int tmpValue = root.val - pre;
+                if (tmpValue < value ){
+                    value = tmpValue;
+                }
+                pre = root.val;
+                root = root.right;
+            }
+        }
+        return value;
+    }
+    public int minDiffInBST3(TreeNode root) {
+        inorderDiff(root);
+        return value;
+    }
+
+    public void inorderDiff(TreeNode root){
+        if (root == null){
+            return;
+        }
+        inorderDiff(root.left);
+        if (pre != null){
+            if (root.val - pre.val < value){
+                value = root.val -pre.val;
+            }
+        }
+        pre = root;
+        inorderDiff(root.right);
+    }
+
+
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q){
         if (p == q)
             return p;
@@ -486,7 +566,22 @@ public class Tree {
             }
         }
     }
+    /**
+     *  todo
+     *  与 preOrderNonRecursion 相比较，这种算法更快
+     */
 
+    public static void preOrderNonRecursion2(TreeNode root){
+        Stack<TreeNode> roots = new Stack<>();
+        while (root != null){
+            visitNode(root);
+            if (root.right != null)
+                roots.push(root.right);
+            root = root.left;
+            if (root == null && !roots.empty())
+                root = roots.pop();
+        }
+    }
     public static void inOrderTravelNonRecursion(TreeNode root){
         Stack<TreeNode> roots = new Stack<>();
         while (true){
@@ -504,6 +599,43 @@ public class Tree {
             }
         }
     }
+    public static void inOrderTravelNonRecursion2(TreeNode root){
+        Stack<TreeNode> roots = new Stack<>();
+        while (root != null){
+            if (root.left != null){
+                roots.push(root.left);
+                root = root.left;
+            }else{
+                visitNode(root);
+                root = root.right;
+                while (root == null){
+                    if (!roots.empty()){
+                        root = roots.pop();
+                        visitNode(root);
+                        root = root.right;
+                    }else {
+                        break;
+                    }
+
+                }
+            }
+        }
+    }
+
+    List<Integer> res = new ArrayList<>();
+    public List<Integer> inorderTraversal(TreeNode root) {
+        inOrderTravelRecursion(root);
+        return res;
+    }
+
+    public void inOrderTravelRecursion(TreeNode root){
+        if (root == null)
+            return;
+        inOrderTravelRecursion(root.left);
+        res.add(root.val);
+        inOrderTravelRecursion(root.right);
+    }
+
 
     public static void visitNode(TreeNode node){
         System.out.println(node.val);

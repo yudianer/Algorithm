@@ -7,9 +7,15 @@ import java.util.*;
 /**
  * @author malujia
  * @create 11-26-2019 下午1:07
+ * todo
+ *  堆排序： 建堆 + 重建堆; 建堆的时间复杂度O(n),重建堆的时间复杂度为O(nlog(n)) => 堆排序的时间复杂度为 O(nlog(n))
+ *  堆的特点： 第一个节点是最大的或者最小的，可以利用的就是这点
+ *
  **/
 
 public class Heap {
+    //
+
     //1. 使用 n-k+1 個元素來建大根堆
     //2. 獲取 根元素 作爲第一個最大的元素
     //3. 其餘的 k-1 個元素的獲取通過：
@@ -41,6 +47,40 @@ public class Heap {
     }
 
 
+    /**
+     * todo
+     *   大顶堆： 堆顶的节点是最大的，
+     *   小顶堆： 堆顶的节点是最小的。
+     *   1. 使用大顶堆：将堆中的最大元素最大元素挤出来存起来。
+     *      过滤出k个最大的元素 ==>  对这些最大的元素做堆排序
+     *                                                                                    -
+     *      maxNodes 保存k个最大的元素。
+     *      1). n-k+1 个元素建堆，O(log(n-k+1))
+     *      2). 堆顶元素是第一个筛选出来的最大元素加入maxNodes。
+     *      3). O((k-1)log(n-k+1))
+     *          for 使用剩下的 k-1 个元素{
+     *              替代堆顶元素
+     *              调整堆 O(log(n-k+1))
+     *              获取堆顶元素
+     *          }
+     *      4). 对 maxNodes 中的元素做堆排序。O(k(log(k)))
+     *                                                                                          -
+     *      最终的时间复杂度：O(log(n-k+1)) + O((k-1)log(n-k+1)) + O(k(log(k)))
+     *                                                                                       -
+     *    2. 使用小顶堆： 将最小值挤到堆顶，然后被抛弃掉（替换掉）。 这样剩下的就是最大的元素。
+     *              过滤掉 n-k 个最小的值，剩下的堆中除了堆顶以外的最大 k 个元素。
+     *              ** 堆顶元素就是用来替换的。
+     *       1). k+1 的元素建堆， 堆顶的元素最小。 O(k+1)
+     *       2). O((n-k-1)log(k+1))
+     *           for 剩下的 n-k-1 个元素{
+     *              代替堆顶的元素
+     *              调整堆(Olog(k+1))
+     *           }
+     *       3). 对堆中的元素进行堆排序. O((k+1)log(k+1))
+     *                                                                                -
+     *       最终时间复杂度: O(k+1) + O((n-k-1)log(k+1)) + O((k+1)log(k+1))
+     *
+     */
     public List<String> topKFrequent(String[] words, int k) {
         if (k> words.length)
             k=words.length;
@@ -111,7 +151,7 @@ public class Heap {
                     wordF.get(words[idx]).equals(wordF.get(words[idx-1])) && words[idx].compareTo(words[idx-1]) <0 )){
                 idx++;
             }
-            // 根元素（i） 是否與 子元素(idx)交換位置。大小根堆的區別就在這裏的交換條件不一樣
+            //info 根元素（i） 是否與 子元素(idx)交換位置。大小根堆的區別就在這裏的交換條件不一樣
             if (wordF.get(tmp) < wordF.get(words[idx-1]) ||
                     wordF.get(tmp).equals(wordF.get(words[idx-1])) && tmp.compareTo(words[idx-1]) > 0){
                 words[i-1] = words[idx-1];
