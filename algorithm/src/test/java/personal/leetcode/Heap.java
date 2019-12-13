@@ -1,6 +1,7 @@
 package personal.leetcode;
 
 import org.junit.Test;
+import org.junit.experimental.theories.suppliers.TestedOn;
 
 import java.util.*;
 
@@ -161,5 +162,72 @@ public class Heap {
             }
         }
         words[i-1] = tmp;
+    }
+
+    //todo 大根堆这样排出来是 升序：1,2,3,4,5
+    @Test
+    public void test(){
+        int[] nums = {5,4,2,3,1};
+        aescOrderedHeapSort(nums);
+    }
+    public static void aescOrderedHeapSort(int[] nums){
+        if (nums.length <= 1)
+            return;
+        for (int n = nums.length; n>1; n--){
+            buildMaxRootHeap(nums, n);
+            int tmpNumsRoot = nums[n - 1];
+            nums[n - 1] = nums[0];
+            nums[0] = tmpNumsRoot;
+        }
+    }
+    private static void buildMaxRootHeap(int[] nums, int n){
+        for (int i = n/2; i > 0 ; i--) {
+            maxRootAdjustDown(nums, i, n);
+        }
+    }
+    /**
+     * 大根堆调整
+     * @param i
+     * @param n
+     */
+    private static void maxRootAdjustDown(int[] nums, int i, int n){
+        int numI = nums[i-1];
+        for (int tmpIdx = 2*i; tmpIdx < n+1; tmpIdx = 2*i){
+            if (tmpIdx < n && nums[tmpIdx-1] < nums[tmpIdx])
+                tmpIdx ++;
+            if (nums[tmpIdx-1] > numI){
+                nums[i-1] = nums[tmpIdx-1];
+                i = tmpIdx;
+            }
+            else break;
+        }
+        nums[i-1] = numI;
+    }
+
+    //todo 小根堆 这样排出来的降序。5,4,3,2,1 因为从数组尾部开始放的。
+    public static void descHeapSort(int[] nums){
+        for (int n = nums.length; n>1;n--){
+            buildMinRootHeap(nums, n);
+            int tmpRootNum = nums[n-1];
+            nums[n-1] = nums[0];
+            nums[0] = tmpRootNum;
+        }
+    }
+    private static void buildMinRootHeap(int[] nums, int n){
+        for (int i = n/2; i>0; i--){
+            minRootAdjustDown(nums, i, n);
+        }
+    }
+    private static void minRootAdjustDown(int[] nums, int i, int n){
+        int numI = nums[i-1];
+        for (int nextIdx = 2*i; nextIdx < n+1; nextIdx = 2*i){
+            if (nextIdx < n && nums[nextIdx-1] > nums[nextIdx])
+                nextIdx++;
+            if (nums[nextIdx] >= numI)
+                break;
+            nums[i-1]= nums[nextIdx-1];
+            i = nextIdx;
+        }
+        nums[i-1] = numI;
     }
 }
