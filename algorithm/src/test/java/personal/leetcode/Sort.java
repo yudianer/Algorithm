@@ -123,6 +123,35 @@ public class Sort {
         return a % 2 != 0;
     }
 
+    @Test
+    public void  test(){
+        int[] nums = {};
+        long start = System.currentTimeMillis();
+        System.out.println(sortArrayByCalculating(nums));
+        System.out.println(System.currentTimeMillis()-start);
+
+    }
+
+    /**
+     * todo 912. Sort an Array
+     * 计数排序，对于大量的数据来说，使用空间换时间是值得的
+     */
+    public List<Integer> sortArrayByCalculating(int[] nums){
+        int[] res = new int[100001];
+        for (int i: nums){
+            res[i+50000] += 1;
+        }
+        List<Integer> numList = new ArrayList<>();
+        for (int i=0;i< res.length; i++) {
+            for (int j=0;j<res[i];j++){
+                numList.add(i-50000);
+            }
+        }
+        return numList;
+    }
+    /**
+     * 数组排序
+     */
     public List<Integer> sortArray(int[] nums) {
         heapSortAsc(nums);
         List<Integer> res = new ArrayList<>();
