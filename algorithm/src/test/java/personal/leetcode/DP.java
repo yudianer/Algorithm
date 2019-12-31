@@ -4,9 +4,14 @@ import org.junit.Test;
 
 /**
  * @author malujia
- * @create 12-26-2019 下午12:04
+ *
+ *info
+ * 困难是找到子问题，并将子问题的结果存储下来，然后使用子问题的结果去解决总问题
+ * 所以动态规划一般都可以使用递归的方式来解决：
+ * f(n) = f(n-1).....
+ * 然后使用 空间换时间的方式，使用数组等方式存储子问题的结果，然后从小往大推
  **/
-//"cbbd"
+
 public class DP {
     @Test
     public void test(){
@@ -51,7 +56,7 @@ public class DP {
     }
 
     /**
-     * todo
+     *todo
      * 使用动态规划，动态规划的思想是先解决小问题，然后利用小问题的解去解决大问题
      * pal[i][j]表示[i,j]是否是回文串。pal[][] = new boolean[s.length()][s.length()]
      * 先把s中所有长度为2的子串测试一遍，填充pal[][]
@@ -156,4 +161,140 @@ public class DP {
         }
         return res;
     }
+
+    /**
+     *todo
+     * ----------------------------------------------------------------------------------
+     * 70. Climbing Stairs
+     * climbStairs(n) = climbStairs(n-2) + clibStairts(n-1)
+     */
+    public int climbStairs(int n) {
+        if(n==1)
+            return 1;
+        if(n==2)
+            return 2;
+        int pre1 =1, pre2=2;
+        int res=0;
+        while(n>2){
+            res=pre1 + pre2;
+            pre1=pre2;
+            pre2=res;
+            n--;
+        }
+        return res;
+    }
+
+    /**
+     *todo
+     * --------------------------------------------------------------------------------
+     * 62. Unique Paths
+     * uniquePaths(m,n) = uniquePaths(m-1,n) + uniquePaths(m,n-1)
+     * 下面代码还可以根据对称性进行优化
+     */
+
+    public int uniquePaths(int m, int n) {
+        int[]sum = new int[n];
+        for(int i=0; i<n; i++){
+            sum[i]=1;
+        }
+        for(int i=1;i<m;i++){
+            for(int j=1;j<n;j++){
+                sum[j] = sum[j-1] + sum[j];
+            }
+        }
+        return sum[n-1];
+    }
+
+
+
+    /**
+     *todo
+     * --------------------------------------------------------------------------------------------------------
+     * 63. Unique Paths II
+     * int[][] obstacleGrid = {{0,1,0,0,0},
+     *                         {1,0,0,0,0},
+     *                         {0,0,0,0,0},
+     *                         {0,0,0,0,0}
+     *                         };
+     * 这个二维数组中 1 是障碍，0可以通过。
+     * 整体思路还是 uniquePaths(m,n) = uniquePaths(m-1,n) + uniquePaths(m,n-1)
+     * 这里需要注意 obstacleGrid(m,n) = 1 时，  uniquePaths(m,n) = 0
+     * 另外，判断第一行和第一列时，uniquePaths(m,0) 或者 uniquePaths(0,n) 不通的情况：
+     *  1. obstacleGrid(m,0) == 1， uniquePaths(0,n) == 1
+     *  2. sum[0]存储的上一行的列 sum[0] == 1，
+     */
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length, n = obstacleGrid[0].length;
+        int[]sum = new int[n];
+        if (obstacleGrid[0][0] == 1){
+            return 0;
+        }
+        sum[0] = 1;
+        int idx = 1;
+        //根据第一行设置，如果前一个元素为1，则后面的元素位置都是不可达的
+        while (idx < n && obstacleGrid[0][idx] == 0){
+                sum[idx ++] = 1;
+        }
+        while (idx<n){
+            sum[idx ++] = 0;
+        }
+        for(int i=1;i<m;i++){
+            //根据每行的第一列，不可达的条件是本身为1,或者前一行的第一列不可达，即sum[0]
+            if (obstacleGrid[i][0] == 1 || sum[0] == 0){
+                sum[0] = 0;
+            }else {
+                sum[0] = 1;
+            }
+            for(int j=1;j<n;j++){
+                if (obstacleGrid[i][j] == 1){
+                    sum[j] = 0;
+                    continue;
+                }
+                sum[j] += sum[j-1];
+            }
+        }
+        return sum[n-1];
+    }
+
+    @Test
+    public void test3(){
+        int[][] obstacleGrid = {
+                {1},
+                {1},
+                {4}
+        };
+        System.out.println(minPathSum(obstacleGrid));
+    }
+    /**
+     *todo
+     * ----------------------------------------------------------------------------------------------------
+     *  64. Minimum Path Sum
+     *  从左上角到右下角，在所有的路径中找到最小路径的路径值
+     *  minPathSum(m,n) = Math.min(minPathSum(m-1,n),minPathSum(m,n-1)) + grid[m,n]
+     * [
+     *   [1,3,1],
+     *   [1,5,1],
+     *   [4,2,1]
+     * ]
+     * Output: 7
+     *       易错处在设置第一行和第一列的值
+     */
+    public int minPathSum(int[][] grid) {
+        int m = grid.length, n = grid[0].length;
+        int[] sum = new int[n];
+        sum[0] = grid[0][0];
+        for (int i = 1; i < sum.length; i++) {
+            sum[i] = sum[i-1] + grid[0][i];
+        }
+        for (int i = 1; i< m; i++){
+            sum[0] += grid[i][0];
+            for (int j = 1; j < n; j++) {
+                if (sum[j]>sum[j-1])
+                    sum[j] = sum[j-1];
+                sum[j] += grid[i][j];
+            }
+        }
+        return sum[n-1];
+    }
+
 }
