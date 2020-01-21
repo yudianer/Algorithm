@@ -2,6 +2,8 @@ package personal.leetcode;
 
 import org.junit.Test;
 
+import java.util.Stack;
+
 /**
  * @author malujia
  *
@@ -297,4 +299,42 @@ public class DP {
         return sum[n-1];
     }
 
+    /**
+     *todo
+     *  -------------------------------------------------------------------------------------------------------
+     *  32. Longest Valid Parentheses
+     */
+    public int longestValidParentheses(String s) {
+        if (s.length() <2)
+            return 0;
+        Stack<Character> chars = new Stack<Character>();
+        Stack<Integer> idx = new Stack<Integer>();
+        for(int i=0;i<s.length();i++){
+            char c = s.charAt(i);
+            if(c == ')' && !chars.isEmpty() && chars.peek() == '('){
+                chars.pop();
+                idx.pop();
+            }else{
+                chars.push(c);
+                idx.push(i);
+            }
+        }
+        int[] nums = new int[idx.size()];
+        for(int i=nums.length-1;i>-1;i--){
+            nums[i]=idx.pop();
+        }
+        int len = 0;
+        int pre = -1;
+        int max = 0;
+        for(int num: nums){
+            len = num-pre-1;
+            if(len > max)
+                max = len;
+            pre = num;
+        }
+        len = s.length() - 1 - pre;
+        if(len>max)
+            max = len;
+        return max > 0? max:0;
+    }
 }
