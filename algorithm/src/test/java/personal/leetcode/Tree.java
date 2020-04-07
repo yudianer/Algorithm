@@ -34,7 +34,7 @@ import java.util.Stack;
  *  非递归中：
  *      先序、中序、后序的特点是先往左遍历。
  *      Stack<TreeNode> roots 保存的都是根。
- *      但是在先序和中序中， 开始访问右节点时会丢失（抛弃）根信息。
+ *      但是在先序和中序中， 开始访问右节点时要丢失（抛弃）根信息。
  *          while(true){
  *              if(root != null){
  *                  // 如果是先序遍历： visitNode(root);
@@ -69,7 +69,30 @@ import java.util.Stack;
  *                  }
  *              }
  *          }
- *
+ *  --------------------------------
+ *  递归: 递归算法首先要考虑，递归出口
+ *      pre/in/postOrderTraversal(root){
+ *          if(root != null){
+ *              //visit(root):preOrder
+ *              traversal(root.left);
+ *              //visit(root):inOrder
+ *              traversal(root.right);
+ *              //visit(root):postOrder
+ *          }
+ *          return;
+ *      }
+ *  例如：
+ *  class Solution {
+ *     List<Integer> nodes = new ArrayList<>();
+ *     public List<Integer> inorderTraversal(TreeNode root) {
+ *         if(root!=null){
+ *             inorderTraversal(root.left);
+ *             nodes.add(root.val);
+ *             inorderTraversal(root.right);
+ *         }
+ *         return nodes;
+ *     }
+ * }
  */
 public class Tree {
 
@@ -95,6 +118,12 @@ public class Tree {
     public void testLow(){
         System.out.println(minDiffInBST3(t4));
     }
+
+    /**
+     * todo
+     * 783. Minimum Distance Between BST Nodes
+     * 对 BST 进行中序遍历得到的就是有序序列
+     */
     public int minDiffInBST(TreeNode root) {
         long pre = Integer.MIN_VALUE;
         long value =Integer.MAX_VALUE;

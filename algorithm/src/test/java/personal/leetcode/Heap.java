@@ -9,7 +9,7 @@ import java.util.*;
  * @author malujia
  * @create 11-26-2019 下午1:07
  * todo
- *  堆排序： 建堆 + 重建堆; 建堆的时间复杂度O(n),重建堆的时间复杂度为O(nlog(n)) => 堆排序的时间复杂度为 O(nlog(n))
+ *  堆排序： 建堆 + 堆调整; 建堆的时间复杂度O(n),调整堆的时间复杂度为O(nlog(n)) => 堆排序的时间复杂度为 O(nlog(n))
  *  堆的特点： 第一个节点是最大的或者最小的，可以利用的就是这点
  *
  **/
@@ -173,11 +173,13 @@ public class Heap {
     public static void aescOrderedHeapSort(int[] nums){
         if (nums.length <= 1)
             return;
-        for (int n = nums.length; n>1; n--){
-            buildMaxRootHeap(nums, n);
+        buildMaxRootHeap(nums, nums.length);
+        for (int n = nums.length; n>1; ){
             int tmpNumsRoot = nums[n - 1];
             nums[n - 1] = nums[0];
             nums[0] = tmpNumsRoot;
+            n--;
+            maxRootAdjustDown(nums, 1, n);
         }
     }
     private static void buildMaxRootHeap(int[] nums, int n){
