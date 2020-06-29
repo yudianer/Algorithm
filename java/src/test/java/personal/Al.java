@@ -3,6 +3,9 @@ package personal;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author malujia
@@ -13,12 +16,10 @@ public class Al {
 
     @Test
     public void minHeapTest(){
-        int[] nums = {2,1,4,5,3};
-        sortMinHeap(nums);
-        System.out.println("-----------------");
-        System.out.println(Arrays.toString(nums));
-        System.out.println("-----------------");
-        sortMaxHeap(nums);
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        System.out.println(System.currentTimeMillis());
+        forkJoinPool.submit(new CounterTask(1, 1000));
+        System.out.println(System.currentTimeMillis());
     }
 
     public static void sortMinHeap(int[] nums){
@@ -79,5 +80,32 @@ public class Al {
             }
         }
         nums[i-1] = tmp;
+    }
+}
+class CounterTask extends RecursiveTask<Integer> {
+    private final int a;
+    private final int b;
+    public CounterTask(int a, int b){
+        this.a = a;
+        this.b = b;
+    }
+    @Override
+    protected Integer compute() {
+        if (b - a < 10){
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return (a+b) * (b-a+1) / 2;
+        }
+        else{
+            int middle = (a+b)/2;
+            CounterTask left = new CounterTask(a, middle);
+            CounterTask right = new CounterTask(middle + 1, b);
+            left.fork();
+            right.fork();
+            return left.join() + right.join();
+        }
     }
 }

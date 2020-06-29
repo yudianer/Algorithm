@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
+import java.util.concurrent.*;
 
 /**
  * Hello world!
@@ -13,28 +14,39 @@ import java.util.HashMap;
  */
 public class App 
 {
-    public static void main( String[] args ) throws IOException {
-        RandomAccessFile file = null;
-        try {
-            file = new RandomAccessFile("/home/maujia/personal/learning/java/src/main/java/personal/java/test.txt", "r");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        System.out.println(file.length());
-        ByteBuffer byteBuffer = ByteBuffer.allocate(2);
-        FileChannel fileChannel = file.getChannel();
-        int bytesRead = fileChannel.read(byteBuffer);
-        System.out.println(bytesRead);
-        while (bytesRead != -1){
-            System.out.println("byte read: " + bytesRead);
-            byteBuffer.flip();
-            while (byteBuffer.hasRemaining()){
-                System.out.println((char)byteBuffer.get());
-            }
-            byteBuffer.clear();
-            bytesRead = fileChannel.read(byteBuffer);
-        }
-        HashMap hashMap = new HashMap();
+    public static void main( String[] args ) throws IOException, ExecutionException, InterruptedException {
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        long start = System.currentTimeMillis();
+        forkJoinPool.submit(new CounterTask2(1, 100000)).get();
+        System.out.println(System.currentTimeMillis() - start);
     }
 
+}
+class CounterTask2 extends RecursiveTask<Integer> {
+    private final int a;
+    private final int b;
+    public CounterTask2(int a, int b){
+        this.a = a;
+        this.b = b;
+    }
+    @Override
+    protected Integer compute() {
+        if (b - a < 100){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return (a+b) * (b-a+1) / 2;
+        }
+        else{
+            int middle = (a+b)/2;
+            CounterTask2 left = new CounterTask2(a, middle);
+            CounterTask2 right = new CounterTask2(middle + 1, b);
+            left.fork();
+            right.fork();
+            invokeAll(left, right);
+            return left.join() + right.join();
+        }
+    }
 }
